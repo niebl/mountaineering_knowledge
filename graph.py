@@ -112,16 +112,30 @@ edge_labels = {("inside", "boulder"): s, ("outside", "boulder"): s, ("artifical"
                ("climable Object", "mountain"): s, ("mountain", "sattlepoint"): p, ("mountain", "summit"): p, ("sattlepoint", "foot"): p, ("summit", "secondary Summit"): s,
                ("mountain Range", "mountain"): p, ("Alpen", "mountain Range"): i, ("Alpen", "Mt. Blanc"): p, ("mountain", "Mt. Blanc"): i, ("artifical", "Kletter Ei"): i}
 
-# Combine node labels and attributes for annotation
-node_attr_labels = {node: f"{node}" for node, attrs in G.nodes(data=True)}
+# Separate labels for node names and attributes
+node_labels = {node: node for node in G.nodes()}
+node_attr_labels = {
+    node: "\n".join([f"{k}: {v}" for k, v in attrs.items()])
+    for node, attrs in G.nodes(data=True)
+}
 
-# Draw the graph
+# Draw the graph nodes
 nx.draw_networkx_nodes(G, pos, nodelist=["climbing Route", "climable Object"], **options2)
 nx.draw_networkx_nodes(G, pos, nodelist=["boulder", "mountain"], **options3)
 nx.draw_networkx_edges(G, pos, width=1.0, alpha=0.5)
-nx.draw_networkx_labels(G, pos, labels=node_attr_labels, font_size=8) # Adjust font size to 8 to match the annotation
+
+# Draw the node names in black
+nx.draw_networkx_labels(G, pos, labels=node_labels, font_size=8, font_color="black")
+
+# Draw the node attributes in gray
+attr_pos = {node: (x, y - 0.2) for node, (x, y) in pos.items()}  # Adjust position for attributes
+nx.draw_networkx_labels(G, attr_pos, labels=node_attr_labels, font_size=8, font_color="grey")
+
+# Draw the edge labels
 nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=8, font_color="grey")
 
 # Set margins for the axes so that nodes aren't clipped
 plt.axis("off")
 plt.show()
+
+
